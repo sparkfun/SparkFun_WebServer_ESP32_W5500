@@ -38,7 +38,7 @@
 // 5: VERBOSE: everything
 
 #ifndef _ETHERNET_WEBSERVER_LOGLEVEL_
-  #define _ETHERNET_WEBSERVER_LOGLEVEL_ 5
+  #define _ETHERNET_WEBSERVER_LOGLEVEL_ 0
 #endif
 
 ///////////////////////////////////////
