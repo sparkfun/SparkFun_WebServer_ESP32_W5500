@@ -1,4 +1,4 @@
-## WebServer_ESP32_W5500 Library
+## SparkFun WebServer ESP32 W5500 Library
 
 A remix of [Khoi Hoang's WebServer_ESP32_W5500](https://github.com/khoih-prog/WebServer_ESP32_W5500) - now archived.
 
