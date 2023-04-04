@@ -25,6 +25,7 @@
 #include "WiFi.h"
 #include "esp_system.h"
 #include "esp_eth.h"
+#include "driver/spi_master.h"
 
 #include <hal/spi_types.h>
 
@@ -49,22 +50,25 @@ class ESP32_W5500
     uint8_t mac_eth[6] = { 0xFE, 0xED, 0xDE, 0xAD, 0xBE, 0xEF };
 
   public:
-#if ESP_IDF_VERSION_MAJOR > 3
     esp_eth_handle_t eth_handle;
+    esp_eth_netif_glue_handle_t netif_glue_handle;
+    esp_eth_phy_t *eth_phy;
+    esp_eth_mac_t *eth_mac;
+    esp_netif_t *eth_netif;
+    spi_device_handle_t spi_handle;
+    int spi_host;
 
     bool started;
     eth_link_t eth_link;
     static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
-#else
-    bool started;
-    eth_config_t eth_config;
-#endif
 
     ESP32_W5500();
     ~ESP32_W5500();
 
     bool begin(int POCI, int PICO, int SCLK, int CS, int INT, int SPICLOCK_MHZ = 25, int SPIHOST = SPI3_HOST,
                uint8_t *W5500_Mac = W5500_Default_Mac);
+
+    void end();
 
     bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = (uint32_t)0x00000000,
                 IPAddress dns2 = (uint32_t)0x00000000);

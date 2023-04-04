@@ -25,7 +25,7 @@
 extern "C"
 {
   esp_eth_mac_t* w5500_begin(int POCI, int PICO, int SCLK, int CS, int INT, int SPICLOCK_MHZ,
-                             int SPIHOST);
+                             int SPIHOST, spi_device_handle_t *spi_handle);
 #include "esp_eth/esp_eth_w5500.h"
 }
 
@@ -67,6 +67,8 @@ bool ESP32_W5500::begin(int POCI, int PICO, int SCLK, int CS, int INT, int SPICL
 {
   tcpipInit();
 
+  spi_host = SPIHOST;
+
   //esp_base_mac_addr_set( W5500_Mac );
   //ESP32 MAC is base + 0, 1, 2, 3 for WiFi, WiFi AP, BT, Ethernet
   if ( esp_read_mac(mac_eth, ESP_MAC_WIFI_STA) == ESP_OK )
@@ -92,9 +94,11 @@ bool ESP32_W5500::begin(int POCI, int PICO, int SCLK, int CS, int INT, int SPICL
   tcpip_adapter_set_default_eth_handlers();
 
   esp_netif_config_t cfg = ESP_NETIF_DEFAULT_ETH();
-  esp_netif_t *eth_netif = esp_netif_new(&cfg);
+  eth_netif = NULL;
+  eth_netif = esp_netif_new(&cfg);
 
-  esp_eth_mac_t *eth_mac = w5500_begin(POCI, PICO, SCLK, CS, INT, SPICLOCK_MHZ, SPIHOST);
+  eth_mac = NULL;
+  eth_mac = w5500_begin(POCI, PICO, SCLK, CS, INT, SPICLOCK_MHZ, spi_host, &spi_handle);
 
   if (eth_mac == NULL)
   {
@@ -106,7 +110,8 @@ bool ESP32_W5500::begin(int POCI, int PICO, int SCLK, int CS, int INT, int SPICL
   eth_phy_config_t phy_config = ETH_PHY_DEFAULT_CONFIG();
   phy_config.autonego_timeout_ms = 0;       // W5500 doesn't support auto-negotiation
   phy_config.reset_gpio_num = -1;           // W5500 doesn't have a pin to reset internal PHY
-  esp_eth_phy_t *eth_phy = esp_eth_phy_new_w5500(&phy_config);
+  eth_phy = NULL;
+  eth_phy = esp_eth_phy_new_w5500(&phy_config);
 
   if (eth_phy == NULL)
   {
@@ -138,7 +143,8 @@ bool ESP32_W5500::begin(int POCI, int PICO, int SCLK, int CS, int INT, int SPICL
 #endif
 
   /* attach Ethernet driver to TCP/IP stack */
-  if (esp_netif_attach(eth_netif, esp_eth_new_netif_glue(eth_handle)) != ESP_OK)
+  netif_glue_handle = esp_eth_new_netif_glue(eth_handle);
+  if (esp_netif_attach(eth_netif, netif_glue_handle) != ESP_OK)
   {
     ET_LOGERROR0("esp_netif_attach failed");
 
@@ -157,6 +163,50 @@ bool ESP32_W5500::begin(int POCI, int PICO, int SCLK, int CS, int INT, int SPICL
   delay(50);
 
   return true;
+}
+
+////////////////////////////////////////
+
+//https://github.com/espressif/esp-idf/issues/4587#issuecomment-573979122
+//https://github.com/Pro/open62541-esp32/blob/master/components/ethernet_helper/connect.c
+void ESP32_W5500::end()
+{
+  if (esp_eth_stop(eth_handle) != ESP_OK)
+  {
+    ET_LOGERROR0("esp_eth_stop failed");
+  }
+  if (esp_eth_del_netif_glue(netif_glue_handle) != ESP_OK)
+  {
+    ET_LOGERROR0("esp_eth_del_netif_glue failed");
+  }
+  if (tcpip_adapter_clear_default_eth_handlers() != ESP_OK)
+  {
+    ET_LOGERROR0("tcpip_adapter_clear_default_eth_handlers failed");
+  }
+  if (esp_eth_driver_uninstall(eth_handle) != ESP_OK)
+  {
+    ET_LOGERROR0("esp_eth_driver_uninstall failed");
+  }
+  if (esp_eth_phy_delete_w5500(eth_phy) != ESP_OK)
+  {
+    ET_LOGERROR0("esp_eth_phy_delete_w5500(eth_phy) failed");
+  }
+  if (esp_eth_mac_delete_w5500(eth_mac) != ESP_OK)
+  {
+    ET_LOGERROR0("esp_eth_mac_delete_w5500(eth_mac) failed");
+  }
+  esp_netif_destroy(eth_netif);
+  eth_netif = NULL;
+
+  if (spi_bus_remove_device(spi_handle) != ESP_OK)
+  {
+    ET_LOGERROR0("spi_bus_remove_device failed");
+  }
+  if (spi_bus_free((spi_host_device_t)spi_host) != ESP_OK)
+  {
+    ET_LOGERROR0("spi_bus_free failed");
+  }
+  gpio_uninstall_isr_service();
 }
 
 ////////////////////////////////////////
