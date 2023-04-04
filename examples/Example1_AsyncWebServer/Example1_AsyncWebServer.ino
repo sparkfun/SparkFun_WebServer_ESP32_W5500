@@ -5,10 +5,10 @@
  * The ESP32_W5500 code uses me-no-dev's ESPAsyncWebServer to serve the page.
  * Standard Ethernet does it manually with client.connected.
  * 
- * ESP32_W5500 can not co-exist with the standard Arduino core for ESP32. The SPI and interrupts fight.
+ * ESP32_W5500 can not co-exist with the standard Arduino core for ESP32. The SPI and interrupt drivers fight.
  * To resolve this, the code boots into either ESP32_W5500 mode or standard Ethernet mode.
  * ESP.restart() restarts the code to change mode.
- * The code creates or deletes a file in LittleFS to indicate which mode should be used.
+ * The code creates or deletes a file in LittleFS to indicate which mode should be used next time.
  * 
  * Licence: please see LICENSE.md for more details.
  */
@@ -79,7 +79,7 @@ void setup()
   //Start LittleFS
   if(!LittleFS.begin(true))
   {
-    Serial.println("LittleFS Mount Failed");
+    Serial.println("LittleFS mount failed");
     return;
   }
 
@@ -109,7 +109,7 @@ void loop()
     File file = LittleFS.open("/useArduinoEthernet.txt", FILE_WRITE);
     file.close();
 
-    Serial.println("Using ESP32_5500:");
+    Serial.println("Using ESP32_W5500:");
     Serial.println();
 
     // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -140,7 +140,7 @@ void loop()
     asyncWebServer->addHandler(asyncWebSocket);
 
     static char webPage[100];
-    snprintf(webPage, sizeof(webPage), "<!DOCTYPE html>\r\n<html>\r\n<h2>I am a ESP32_W5500 web page</h2>\r\n<br>\r\n</html>\r\n");
+    snprintf(webPage, sizeof(webPage), "<!DOCTYPE html>\r\n<html>\r\n<h2>I am an ESP32_W5500 web page</h2>\r\n<br>\r\n</html>\r\n");
     
     asyncWebServer->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send(200, "text/html", webPage);
@@ -239,7 +239,7 @@ void loop()
               client.println();
               client.println("<!DOCTYPE HTML>");
               client.println("<html>");
-              client.println("<h2>I am a Ethernet web page</h2>");
+              client.println("<h2>I am an Ethernet web page</h2>");
               client.println("</html>");
               break;
             }

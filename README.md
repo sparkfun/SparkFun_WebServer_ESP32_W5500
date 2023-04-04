@@ -11,7 +11,7 @@ This library adds the WIZnet W5500 as a physical Ethernet interface for the ESP3
 This library uses the low-level TCP-IP, NETIF, SPI bus and interrupt service methods from the Espressif ESP-IDF. It can not co-exist with the SPI and interrupt methods from the Arduino core for ESP32.
 They fight each other... If - like us - you are using this library in Arduino code, you need to structure your code carefully so nothing else attempts to configure or access SPI or interrupts while the WebServer is in use.
 
-The ESP32_W5500 WebServer class makes changes to the ESP32 memory which are not cleared by a standard ```ESP.restart()```. Make sure you call the ```.end()``` method before restarting your code if you want to change over to Arduino Ethernet, SPI and interrupts.
+The ESP32_W5500 WebServer class makes changes to the ESP32 memory which are not cleared by a standard ```ESP.restart()```. Make sure you call the ```.end()``` method before restarting your code if you want to change over to Arduino Ethernet, SPI and interrupts. Please see [Example1](https://github.com/sparkfun/SparkFun_WebServer_ESP32_W5500/blob/main/examples/Example1_AsyncWebServer/Example1_AsyncWebServer.ino) for more details.
 
 ---
 
