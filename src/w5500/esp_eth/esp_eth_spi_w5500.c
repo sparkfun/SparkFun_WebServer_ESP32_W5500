@@ -58,7 +58,7 @@ esp_eth_mac_t* w5500_new_mac( spi_device_handle_t *spi_handle, int INT_GPIO )
 ////////////////////////////////////////
 
 esp_eth_mac_t* w5500_begin(int POCI_GPIO, int PICO_GPIO, int SCLK_GPIO, int CS_GPIO, int INT_GPIO, int SPICLOCK_MHZ,
-                           int SPIHOST)
+                           int SPIHOST, spi_device_handle_t *spi_handle)
 {
   if (ESP_OK != gpio_install_isr_service(0))
   {
@@ -95,16 +95,16 @@ esp_eth_mac_t* w5500_begin(int POCI_GPIO, int PICO_GPIO, int SCLK_GPIO, int CS_G
     .cs_ena_posttrans = w5500_cal_spi_cs_hold_time(SPICLOCK_MHZ),
   };
 
-  spi_device_handle_t spi_handle = NULL;
+  *spi_handle = NULL;
 
-  if (ESP_OK != spi_bus_add_device( SPIHOST, &devcfg, &spi_handle ))
+  if (ESP_OK != spi_bus_add_device( SPIHOST, &devcfg, spi_handle ))
   {
     ESP_LOGE(TAG, "%s(%d): Error spi_bus_add_device", __FUNCTION__, __LINE__);
 
     return NULL;
   }
 
-  return w5500_new_mac( &spi_handle, INT_GPIO );
+  return w5500_new_mac( spi_handle, INT_GPIO );
 }
 
 ////////////////////////////////////////
