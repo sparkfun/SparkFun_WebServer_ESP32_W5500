@@ -115,6 +115,18 @@ esp_eth_mac_t *esp_eth_mac_new_w5500(const eth_w5500_config_t *w5500_config,
 ////////////////////////////////////////
 
 /**
+  @brief Delete w5500 Ethernet MAC instance
+
+  @param[in] mac: pointer to the esp_eth_mac_t
+
+  @return
+       - esp_err_t
+*/
+esp_err_t esp_eth_mac_delete_w5500(esp_eth_mac_t *mac);
+
+////////////////////////////////////////
+
+/**
   @brief Create a PHY instance of w5500
 
   @param[in] config: configuration of PHY
@@ -124,6 +136,18 @@ esp_eth_mac_t *esp_eth_mac_new_w5500(const eth_w5500_config_t *w5500_config,
        - NULL: create PHY instance failed because some error occurred
 */
 esp_eth_phy_t *esp_eth_phy_new_w5500(const eth_phy_config_t *config);
+
+////////////////////////////////////////
+
+/**
+  @brief Delete w5500 Ethernet PHY instance
+
+  @param[in] phy: pointer to the esp_eth_phy_t
+
+  @return
+       - esp_err_t
+*/
+esp_err_t esp_eth_phy_delete_w5500(esp_eth_phy_t *phy);
 
 ////////////////////////////////////////
 
