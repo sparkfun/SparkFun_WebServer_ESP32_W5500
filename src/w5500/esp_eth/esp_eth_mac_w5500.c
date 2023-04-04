@@ -957,3 +957,14 @@ err:
 
 ////////////////////////////////////////
 
+esp_err_t esp_eth_mac_delete_w5500(esp_eth_mac_t *mac)
+{
+  esp_err_t ret = mac->deinit(mac);
+  if (ret != ESP_OK)
+    return ret;
+  ret = mac->del(mac);
+  return ret;
+}
+
+////////////////////////////////////////
+

@@ -378,3 +378,14 @@ err:
 
 ////////////////////////////////////////
 
+esp_err_t esp_eth_phy_delete_w5500(esp_eth_phy_t *phy)
+{
+  esp_err_t ret = phy->deinit(phy);
+  if (ret != ESP_OK)
+    return ret;
+  ret = phy->del(phy);
+  return ret;
+}
+
+////////////////////////////////////////
+
