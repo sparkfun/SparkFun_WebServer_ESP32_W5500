@@ -1,22 +1,16 @@
 /****************************************************************************************************************************
-  esp32_w5500.h
-
+  SparkFun_esp32_w5500.h
+  
   For Ethernet shields using ESP32_W5500 (ESP32 + W5500)
 
   WebServer_ESP32_W5500 is a library for the ESP32 with Ethernet W5500 to run WebServer
 
   Based on and modified from ESP32-IDF https://github.com/espressif/esp-idf
   Built by Khoi Hoang https://github.com/khoih-prog/WebServer_ESP32_W5500
+  Modified by SparkFun
   Licensed under GPLv3 license
 
-  Version: 1.5.4
-
-  Version Modified By   Date      Comments
-  ------- -----------  ---------- -----------
-  1.5.1   K Hoang      29/11/2022 Initial coding for ESP32_W5500 (ESP32 + W5500). Sync with WebServer_WT32_ETH01 v1.5.1
-  1.5.2   K Hoang      06/01/2023 Suppress compile error when using aggressive compile settings
-  1.5.3   K Hoang      11/01/2023 Using `SPI_DMA_CH_AUTO` and built-in ESP32 MAC
-  1.5.4   SparkFun     April 2023 Add the .end method. Change ET_LOG to use ESP32 log_d etc.
+  Please see SparkFun_WebServer_ESP32_W5500.h for the version information
  *****************************************************************************************************************************/
 
 #ifndef _ESP32_W5500_H_
@@ -28,12 +22,6 @@
 #include "driver/spi_master.h"
 
 #include <hal/spi_types.h>
-
-////////////////////////////////////////
-
-#if ESP_IDF_VERSION_MAJOR < 4 || ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4,4,0)
-  #error "This version of Arduino is too old"
-#endif
 
 ////////////////////////////////////////
 
@@ -57,6 +45,7 @@ class ESP32_W5500
     esp_netif_t *eth_netif;
     spi_device_handle_t spi_handle;
     int spi_host;
+    esp_eth_config_t eth_config;
 
     bool started;
     eth_link_t eth_link;
