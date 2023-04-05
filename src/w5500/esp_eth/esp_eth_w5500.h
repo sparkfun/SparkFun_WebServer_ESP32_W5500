@@ -7,16 +7,10 @@
 
   Based on and modified from ESP32-IDF https://github.com/espressif/esp-idf
   Built by Khoi Hoang https://github.com/khoih-prog/WebServer_ESP32_W5500
+  Modified by SparkFun
   Licensed under GPLv3 license
 
-  Version: 1.5.4
-
-  Version Modified By   Date      Comments
-  ------- -----------  ---------- -----------
-  1.5.1   K Hoang      29/11/2022 Initial coding for ESP32_W5500 (ESP32 + W5500). Sync with WebServer_WT32_ETH01 v1.5.1
-  1.5.2   K Hoang      06/01/2023 Suppress compile error when using aggressive compile settings
-  1.5.3   K Hoang      11/01/2023 Using `SPI_DMA_CH_AUTO` and built-in ESP32 MAC
-  1.5.4   SparkFun     April 2023 Add the .end method. Change ET_LOG to use ESP32 log_d etc.
+  Please see SparkFun_WebServer_ESP32_W5500.h for the version information
  *****************************************************************************************************************************/
 
 // Copyright 2021 Espressif Systems (Shanghai) PTE LTD
@@ -163,6 +157,45 @@ esp_err_t esp_eth_phy_delete_w5500(esp_eth_phy_t *phy);
             - ESP_OK when PHY registers were correctly written.
 */
 esp_err_t w5500_set_phy_duplex(esp_eth_phy_t *phy, eth_duplex_t duplex);
+
+////////////////////////////////////////
+
+/**
+  @brief Update and return the link status
+
+  @param phy: pointer to the esp_eth_phy_t
+  @param link_status: pointer to the link status
+
+  @return
+       - esp_err_t
+*/
+esp_err_t w5500_get_link_status(esp_eth_phy_t *phy, eth_link_t *link_status);
+
+////////////////////////////////////////
+
+/**
+  @brief Update and return the link speed
+
+  @param phy: pointer to the esp_eth_phy_t
+  @param speed: pointer to the speed
+
+  @return
+       - esp_err_t
+*/
+esp_err_t w5500_get_speed(esp_eth_phy_t *phy, eth_speed_t *speed);
+
+////////////////////////////////////////
+
+/**
+  @brief Update and return the link duplex
+
+  @param phy: pointer to the esp_eth_phy_t
+  @param duplex: pointer to the duplex mode
+
+  @return
+       - esp_err_t
+*/
+esp_err_t w5500_get_duplex(esp_eth_phy_t *phy, eth_duplex_t *duplex);
 
 ////////////////////////////////////////
 

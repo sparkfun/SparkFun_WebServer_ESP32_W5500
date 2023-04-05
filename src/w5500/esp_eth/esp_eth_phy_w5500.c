@@ -7,16 +7,10 @@
 
   Based on and modified from ESP32-IDF https://github.com/espressif/esp-idf
   Built by Khoi Hoang https://github.com/khoih-prog/WebServer_ESP32_W5500
+  Modified by SparkFun
   Licensed under GPLv3 license
 
-  Version: 1.5.4
-
-  Version Modified By   Date      Comments
-  ------- -----------  ---------- -----------
-  1.5.1   K Hoang      29/11/2022 Initial coding for ESP32_W5500 (ESP32 + W5500). Sync with WebServer_WT32_ETH01 v1.5.1
-  1.5.2   K Hoang      06/01/2023 Suppress compile error when using aggressive compile settings
-  1.5.3   K Hoang      11/01/2023 Using `SPI_DMA_CH_AUTO` and built-in ESP32 MAC
-  1.5.4   SparkFun     April 2023 Add the .end method. Change ET_LOG to use ESP32 log_d etc.
+  Please see SparkFun_WebServer_ESP32_W5500.h for the version information
  *****************************************************************************************************************************/
 
 // Copyright 2020 Espressif Systems (Shanghai) PTE LTD
@@ -47,6 +41,7 @@
 #include "esp_rom_gpio.h"
 #include "esp_rom_sys.h"
 #include "w5500.h"
+#include "esp_eth_w5500.h"
 
 ////////////////////////////////////////
 
@@ -85,6 +80,8 @@ typedef struct
   uint32_t autonego_timeout_ms;
   eth_link_t link_status;
   int reset_gpio_num;
+  eth_speed_t speed;
+  eth_duplex_t duplex;
 } phy_w5500_t;
 
 ////////////////////////////////////////
@@ -127,7 +124,9 @@ static esp_err_t w5500_update_link_duplex_speed(phy_w5500_t *w5500)
       }
 
       ESP_GOTO_ON_ERROR(eth->on_state_changed(eth, ETH_STATE_SPEED, (void *)speed), err, TAG, "Change speed failed");
+      w5500->speed = speed;
       ESP_GOTO_ON_ERROR(eth->on_state_changed(eth, ETH_STATE_DUPLEX, (void *)duplex), err, TAG, "Change duplex failed");
+      w5500->duplex = duplex;
     }
 
     ESP_GOTO_ON_ERROR(eth->on_state_changed(eth, ETH_STATE_LINK, (void *)link), err, TAG, "Change link failed");
@@ -166,6 +165,63 @@ static esp_err_t w5500_get_link(esp_eth_phy_t *phy)
 
   /* Updata information about link, speed, duplex */
   ESP_GOTO_ON_ERROR(w5500_update_link_duplex_speed(w5500), err, TAG, "Update link duplex speed failed");
+
+  return ESP_OK;
+
+err:
+  return ret;
+}
+
+////////////////////////////////////////
+
+esp_err_t w5500_get_link_status(esp_eth_phy_t *phy, eth_link_t *link_status)
+{
+  esp_err_t ret = ESP_OK;
+
+  phy_w5500_t *w5500 = __containerof(phy, phy_w5500_t, parent);
+
+  /* Updata information about link, speed, duplex */
+  ESP_GOTO_ON_ERROR(w5500_update_link_duplex_speed(w5500), err, TAG, "Update link duplex speed failed");
+
+  *link_status = w5500->link_status;
+
+  return ESP_OK;
+
+err:
+  return ret;
+}
+
+////////////////////////////////////////
+
+esp_err_t w5500_get_speed(esp_eth_phy_t *phy, eth_speed_t *speed)
+{
+  esp_err_t ret = ESP_OK;
+
+  phy_w5500_t *w5500 = __containerof(phy, phy_w5500_t, parent);
+
+  /* Updata information about link, speed, duplex */
+  ESP_GOTO_ON_ERROR(w5500_update_link_duplex_speed(w5500), err, TAG, "Update link duplex speed failed");
+
+  *speed = w5500->speed;
+
+  return ESP_OK;
+
+err:
+  return ret;
+}
+
+////////////////////////////////////////
+
+esp_err_t w5500_get_duplex(esp_eth_phy_t *phy, eth_duplex_t *duplex)
+{
+  esp_err_t ret = ESP_OK;
+
+  phy_w5500_t *w5500 = __containerof(phy, phy_w5500_t, parent);
+
+  /* Updata information about link, speed, duplex */
+  ESP_GOTO_ON_ERROR(w5500_update_link_duplex_speed(w5500), err, TAG, "Update link duplex speed failed");
+
+  *duplex = w5500->duplex;
 
   return ESP_OK;
 

@@ -1,5 +1,5 @@
 /****************************************************************************************************************************
-  esp32_w5500.cpp
+  SparkFun_esp32_w5500.cpp
 
   For Ethernet shields using ESP32_W5500 (ESP32 + W5500)
 
@@ -7,16 +7,10 @@
 
   Based on and modified from ESP32-IDF https://github.com/espressif/esp-idf
   Built by Khoi Hoang https://github.com/khoih-prog/WebServer_ESP32_W5500
+  Modified by SparkFun
   Licensed under GPLv3 license
 
-  Version: 1.5.4
-
-  Version Modified By   Date      Comments
-  ------- -----------  ---------- -----------
-  1.5.1   K Hoang      29/11/2022 Initial coding for ESP32_W5500 (ESP32 + W5500). Sync with WebServer_WT32_ETH01 v1.5.1
-  1.5.2   K Hoang      06/01/2023 Suppress compile error when using aggressive compile settings
-  1.5.3   K Hoang      11/01/2023 Using `SPI_DMA_CH_AUTO` and built-in ESP32 MAC
-  1.5.4   SparkFun     April 2023 Add the .end method. Change ET_LOG to use ESP32 log_d etc.
+  Please see SparkFun_WebServer_ESP32_W5500.h for the version information
  *****************************************************************************************************************************/
 
 #include "SparkFun_WebServer_ESP32_W5500_Debug.h"
@@ -121,7 +115,7 @@ bool ESP32_W5500::begin(int POCI, int PICO, int SCLK, int CS, int INT, int SPICL
   }
 
   eth_handle = NULL;
-  esp_eth_config_t eth_config = ETH_DEFAULT_CONFIG(eth_mac, eth_phy);
+  eth_config = ETH_DEFAULT_CONFIG(eth_mac, eth_phy);
 
   if (esp_eth_driver_install(&eth_config, &eth_handle) != ESP_OK || eth_handle == NULL)
   {
@@ -402,35 +396,27 @@ bool ESP32_W5500::setHostname(const char * hostname)
 
 bool ESP32_W5500::fullDuplex()
 {
-#ifdef ESP_IDF_VERSION_MAJOR
-  return true;//todo: do not see an API for this
-#else
-  return eth_config.phy_get_duplex_mode();
-#endif
+  eth_duplex_t duplex;
+  w5500_get_duplex(eth_phy, &duplex);
+  return (duplex == ETH_DUPLEX_FULL);
 }
 
 ////////////////////////////////////////
 
 bool ESP32_W5500::linkUp()
 {
-#ifdef ESP_IDF_VERSION_MAJOR
-  return eth_link == ETH_LINK_UP;
-#else
-  return eth_config.phy_check_link();
-#endif
+  eth_link_t link_status;
+  w5500_get_link_status(eth_phy, &link_status);
+  return (link_status == ETH_LINK_UP);
 }
 
 ////////////////////////////////////////
 
 uint8_t ESP32_W5500::linkSpeed()
 {
-#ifdef ESP_IDF_VERSION_MAJOR
-  eth_speed_t link_speed;
-  esp_eth_ioctl(eth_handle, ETH_CMD_G_SPEED, &link_speed);
-  return (link_speed == ETH_SPEED_10M) ? 10 : 100;
-#else
-  return eth_config.phy_get_speed_mode() ? 100 : 10;
-#endif
+  eth_speed_t speed;
+  w5500_get_speed(eth_phy, &speed);
+  return (speed == ETH_SPEED_100M ? 100 : 10);
 }
 
 ////////////////////////////////////////
