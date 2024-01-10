@@ -17,7 +17,7 @@ The ESP32_W5500 WebServer class makes changes to the ESP32 memory which are not 
 
 ## License
 
-- The library is licensed under [GPLv3](https://github.com/SparkFun/WebServer_ESP32_W5500/blob/main/LICENSE)
+- The library is licensed under [GPL-3.0-only](https://github.com/sparkfun/SparkFun_WebServer_ESP32_W5500/blob/main/LICENSE)
 
 ---
 
