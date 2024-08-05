@@ -1,5 +1,7 @@
 ## SparkFun WebServer ESP32 W5500 Library
 
+**Important Note: this library is not compatible with arduino-esp32 v3.0**
+
 A remix of [Khoi Hoang's WebServer_ESP32_W5500](https://github.com/khoih-prog/WebServer_ESP32_W5500) (now archived).
 
 Thank you Khoi.
